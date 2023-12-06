@@ -1,0 +1,48 @@
+type Expense {
+  id: ID!
+  amount: Float!
+  description: String!
+  paymentMode: String!
+  category: String!
+}
+type Card {
+  id: ID!
+  cardName: String!
+  lastFourDigit: Int!
+  cardType: CardType!
+  user: User!
+}
+
+type User {
+  id: ID!
+  fullName: String!
+  email: String!
+  password: String!
+  availableBalance: Float
+  cardDetails: [Card]
+}
+
+enum CardType {
+  DEBIT_CARD
+  CREDIT_CARD
+}
+
+input LoginDetailsDto {
+  email: String!
+  password: String!
+}
+
+input CardDetailsDto {
+  cardName: String!
+  lastFourDigit: Int!
+  cardType: CardType!
+  userId: Int!
+}
+
+type Query {
+  loginUser(userLoginDetails: LoginDetailsDto): User
+}
+
+type Mutation {
+  addCardDetails(cardDetails: CardDetailsDto): User
+}
