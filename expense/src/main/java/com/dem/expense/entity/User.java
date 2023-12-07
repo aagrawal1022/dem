@@ -1,5 +1,6 @@
 package com.dem.expense.entity;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -22,13 +23,16 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
     private String password;
-    private Double availableBalance;
+    private BigDecimal availableBalance;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Card> cardDetails;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<BankAccount> bankAccounts;
+
+    @OneToMany(mappedBy = "user")
+    private List<Expense> expenses;
 
     @Override
     public String toString() {

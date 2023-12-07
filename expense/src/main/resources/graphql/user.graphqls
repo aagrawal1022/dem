@@ -1,0 +1,80 @@
+type Card {
+  id: ID!
+  cardName: String!
+  lastFourDigit: Int!
+  cardType: CardType!
+  user: User!
+}
+
+type BankAccount {
+ id: ID!
+ bankName: String!
+ lastFourDigit: Int!
+ user: User!
+}
+
+type User {
+  id: ID!
+  fullName: String!
+  email: String!
+  password: String!
+  availableBalance: Float
+  cardDetails: [Card]
+  bankAccounts: [BankAccount]
+}
+
+enum CardType {
+  DEBIT_CARD
+  CREDIT_CARD
+}
+
+input LoginDetailsDto {
+  email: String!
+  password: String!
+}
+
+input CardDetailsDto {
+  cardName: String!
+  lastFourDigit: Int!
+  cardType: CardType!
+  userId: Int!
+}
+
+input BankDetailsDto {
+  bankName: String!
+  lastFourDigit: Int
+  userId: Int!
+}
+
+type Query {
+  loginUser(userLoginDetails: LoginDetailsDto): User
+}
+input AddExpenseInput {
+  description: String!
+  paymentMethod: String!
+  amount: Float!
+  expenseDate: String!
+  cardId: Int
+  bankAccountId: Int
+  userId: Int
+  category: String!
+}
+
+type Expense {
+  id: ID!
+  description: String!
+  paymentMethod: String!
+  amount: Float!
+  expenseDate: String!
+  category: String!
+  card: Card
+  bankAccount: BankAccount
+}
+
+type Mutation {
+  addCardDetails(cardDetails: CardDetailsDto): User
+  addBankAccount(bankDetails: BankDetailsDto): User
+  removeCard(cardId: Int, userId: Int): User
+  removeBankAccount(accountId: Int, userId: Int): User
+  addExpense(expenseDetails: AddExpenseInput): Expense
+}

@@ -6,20 +6,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigInteger;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CardDetailsDto {
+public class CardDetailsDto extends GeneralDto {
 
     private String cardName;
 
     private Long lastFourDigit;
 
     private CardType cardType;
-
-    private BigInteger userId;
 
 }

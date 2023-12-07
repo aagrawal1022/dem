@@ -12,8 +12,20 @@ public class BankAccount {
     private Long id;
 
     private String bankName;
-    private Number lastFourDigit;
+    private Long lastFourDigit;
 
     @ManyToOne
     private User user;
+
+    @OneToOne
+    private Expense expense;
+
+    @Override
+    public String toString() {
+        return "BankAccount{" +
+                "id=" + id +
+                ", bankName='" + bankName + '\'' +
+                ", lastFourDigit=" + lastFourDigit +
+                '}';
+    }
 }

@@ -22,6 +22,9 @@ public class Card {
     @ManyToOne
     private User user;
 
+    @OneToOne
+    private Expense expense;
+
     @Override
     public String toString() {
         return "Card{" +
