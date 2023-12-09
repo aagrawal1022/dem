@@ -12,20 +12,31 @@ import {
 } from "@mui/material";
 import { NavigationBar } from "shared/NavigationBar";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "store/store";
-import { store } from "store/store";
+import { RootState, store } from "store/store";
+import { useNavigate } from "react-router-dom";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { LoginDetailsDto } from "./components/Login.constant";
+import { client } from "config/apollo.config";
+import { authGqls } from "auth/Auth.gqls";
 import { login as userLogin } from "store/slices/authSlice";
-import { useNavigate } from 'react-router-dom';
-import { dummyUser } from "utils/types/user";
 
 export const Login: React.FC = () => {
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginDetailsDto>();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    console.log('trying to login');
-    e.preventDefault();
-    store.dispatch(userLogin(dummyUser));
+  const onSubmit = async (formData: LoginDetailsDto) => {
+    const result = await client.query({
+      query: authGqls.queries.loginUser,
+      variables: {
+        userLoginDetails: formData,
+      },
+    });
+    store.dispatch(userLogin(result.data.loginUser));
     navigate('/add-expense');
   };
 
@@ -56,7 +67,7 @@ export const Login: React.FC = () => {
               Login
             </Typography>
             <form
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmit(onSubmit)}
               style={{ width: "100%", marginTop: "20px" }}
             >
               <TextField
@@ -64,10 +75,11 @@ export const Login: React.FC = () => {
                 margin="normal"
                 required
                 fullWidth
-                id="username"
-                label="Username"
-                name="username"
-                autoComplete="username"
+                id="email"
+                label="email"
+                name="email"
+                autoComplete="email"
+                {...register("email", { required: "Email is required" })}
               />
               <TextField
                 variant="outlined"
@@ -79,6 +91,7 @@ export const Login: React.FC = () => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                {...register("password", { required: "Password is required" })}
               />
               <Button
                 type="submit"
@@ -96,3 +109,4 @@ export const Login: React.FC = () => {
     )
   );
 };
+

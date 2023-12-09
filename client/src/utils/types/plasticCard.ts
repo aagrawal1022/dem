@@ -1,9 +1,10 @@
 export enum CardType {
-  DebitCard = "debitCard",
-  CreditCard = "creditCard",
+  DebitCard = "DEBIT_CARD",
+  CreditCard = "CREDIT_CARD",
 }
 
 export interface Card {
+  id: number;
   cardName: string;
   cardType?: CardType;
   lastFourDigit?: number;
