@@ -4,14 +4,13 @@ public enum CardType {
     DEBIT_CARD("debitCard"),
     CREDIT_CARD("creditCard");
 
-    private String message;
+    private String value;
 
-    private CardType(String message) {
-        this.message = message;
+    CardType(String value) {
+        this.value = value;
     }
 
-    @Override
-    public String toString() {
-        return message;
+    public String getValue() {
+        return value;
     }
 }

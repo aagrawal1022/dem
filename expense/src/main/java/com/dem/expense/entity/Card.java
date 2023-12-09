@@ -22,8 +22,12 @@ public class Card {
     @ManyToOne
     private User user;
 
-    @OneToOne
-    private Expense expense;
+    public void setCardType(CardType cardType) {
+        if (cardType == null) {
+            throw new IllegalArgumentException("Card type cannot be null");
+        }
+        this.cardType = cardType;
+    }
 
     @Override
     public String toString() {

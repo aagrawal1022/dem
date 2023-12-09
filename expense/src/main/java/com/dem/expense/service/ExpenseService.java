@@ -6,12 +6,14 @@ import com.dem.expense.entity.User;
 import com.dem.expense.exception.UserNotFoundException;
 import com.dem.expense.repository.ExpenseRepository;
 import com.dem.expense.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
 @Service
+@Slf4j
 public class ExpenseService {
 
     @Autowired
@@ -33,20 +35,14 @@ public class ExpenseService {
         expense.setUser(user);
 
         if (addExpenseDto.getBankAccountId() != null) {
-            expense.setBankAccount(user.getBankAccounts().stream()
-                    .filter(bankAccount -> bankAccount.getId().equals(addExpenseDto.getBankAccountId()))
-                    .findFirst()
-                    .orElse(null));
+            expense.setBankAccountId(addExpenseDto.getBankAccountId());
         }
         if (addExpenseDto.getCardId() != null) {
-            expense.setCard(user.getCardDetails().stream()
-                    .filter(card -> card.getId().equals(addExpenseDto.getCardId()))
-                    .findFirst()
-                    .orElse(null));
+            expense.setCardId(addExpenseDto.getCardId());
         }
         BigDecimal newBalance = user.getAvailableBalance().subtract(expense.getAmount());
         user.setAvailableBalance(newBalance);
-
+        log.info("Saving expense : {}", expense);
         expenseRepository.save(expense);
         userRepository.save(user);
 

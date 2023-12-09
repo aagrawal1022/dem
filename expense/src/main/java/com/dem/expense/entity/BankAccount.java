@@ -17,8 +17,6 @@ public class BankAccount {
     @ManyToOne
     private User user;
 
-    @OneToOne
-    private Expense expense;
 
     @Override
     public String toString() {

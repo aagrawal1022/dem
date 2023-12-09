@@ -2,6 +2,7 @@ package com.dem.expense.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,13 +19,9 @@ public class Expense {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "bank_account_id")
-    private BankAccount bankAccount;
+    private Long bankAccountId;
 
-    @OneToOne
-    @JoinColumn(name = "card_id")
-    private Card card;
+    private Long cardId;
 
     @Column(nullable = false)
     private String category;
