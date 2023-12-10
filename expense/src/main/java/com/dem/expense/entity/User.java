@@ -34,6 +34,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Expense> expenses;
 
+    @OneToMany(mappedBy = "user")
+    private List<Income> income;
     @Override
     public String toString() {
         return "User{" +

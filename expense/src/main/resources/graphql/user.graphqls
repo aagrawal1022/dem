@@ -46,6 +46,7 @@ input BankDetailsDto {
   userId: Int!
 }
 
+
 type Query {
   loginUser(userLoginDetails: LoginDetailsDto): User
 }
@@ -77,4 +78,25 @@ type Mutation {
   removeCard(cardId: Int, userId: Int): User
   removeBankAccount(accountId: Int, userId: Int): User
   addExpense(expenseDetails: AddExpenseInput): Expense
+  addIncome(incomeDetails: IncomeInput): Income
+}
+
+input IncomeInput  {
+  description: String!
+  amount: Float!
+  incomeDate: String!
+  category: String!
+  bankAccountId: Int
+  userId: Int!
+  isPseudoIncome: Boolean
+}
+
+type Income {
+  id: ID!
+  description: String!
+  amount: Float!
+  incomeDate: String!
+  category: String!
+  bankAccountId: Int
+  isPseudoIncome: Boolean
 }

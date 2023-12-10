@@ -21,7 +21,6 @@ import java.math.BigInteger;
 @Controller
 @AllArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserResolver {
 
     @Autowired

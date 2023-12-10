@@ -21,3 +21,13 @@ export const OtherIncomeCategoryTitle: Record<OtherIncomeCategory, string> = {
   [OtherIncomeCategory.ProvidentFund]: "Provident Fund",
   [OtherIncomeCategory.IncomeTax]: "Income Tax (TDS)",
 };
+
+export interface AddIncomeInput {
+  description: String;
+  amount: unknown ;
+  expenseDate?: String;
+  bankAccountId?: number;
+  userId?: number;
+  category: String;
+  isPseudoIncome: boolean;
+}

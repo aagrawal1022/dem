@@ -1,5 +1,5 @@
 // IncomeForm.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -16,34 +16,52 @@ import { RootState } from "store/store";
 import { useSelector } from "react-redux";
 import { BankAccount } from "utils/types/bankAccount";
 import {
+  AddIncomeInput,
   IncomeCategory,
   IncomeCategoryTitle,
   OtherIncomeCategory,
   OtherIncomeCategoryTitle,
 } from "./IncomeForm.const";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useMutation } from "@apollo/client";
+import { incomeGqls } from "./Income.gqls";
 
 export const IncomeForm = () => {
-  const { bankAccounts } = useSelector((state: RootState) => state.user.user);
-  const [amount, setAmount] = useState<number>();
-  const [description, setDescription] = useState("");
-  const [bankAccount, setBankAccount] = useState<BankAccount>();
-  const [incomeCategory, setIncomeCategory] = useState<IncomeCategory>(
-    IncomeCategory.Salary
+  const { bankAccounts, id: userId } = useSelector(
+    (state: RootState) => state.user.user
   );
-  const [otherIncomeCategory, setOtherIncomeCategory] =
-    useState<OtherIncomeCategory>(OtherIncomeCategory.ProvidentFund);
-  const [isOtherIncomeEnabled, setIsOtherIncomeEnabled] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    reset,
+    register,
+    unregister,
+    formState: { errors },
+  } = useForm<AddIncomeInput>();
+  const [isPseudoIncome, setIsPseudoIncome] = useState(false);
+  const [addingIncome] = useMutation(incomeGqls.mutations.addIncome);
 
-  const handleAddIncome = () => {
-    console.log("Adding income:", {
-      amount,
-      description,
-      bankAccount,
-      incomeCategory,
-      isOtherIncomeEnabled,
+  const onSubmit: SubmitHandler<AddIncomeInput> = async (formData) => {
+    const incomeDetails = {
+      ...formData,
+      amount: parseFloat(formData.amount as string),
+      incomeDate: new Date().toISOString().slice(0, -5),
+      userId: +userId,
+      isPseudoIncome,
+    };
+    const result = await addingIncome({
+      variables: {
+        incomeDetails,
+      },
     });
+    reset();
   };
 
+  useEffect(() => {
+    if (isPseudoIncome) {
+      unregister("bankAccountId");
+    }
+  }, [isPseudoIncome]);
   return (
     <Container maxWidth="sm">
       <Typography variant="h5" gutterBottom align="center">
@@ -55,101 +73,113 @@ export const IncomeForm = () => {
             <Grid item>Enable Other Income</Grid>
             <Grid item>
               <Switch
-                checked={isOtherIncomeEnabled}
-                onChange={() => setIsOtherIncomeEnabled(!isOtherIncomeEnabled)}
-                name="otherIncomeToggle"
+                checked={isPseudoIncome}
+                onChange={() => setIsPseudoIncome(!isPseudoIncome)}
+                name="pseudoIncomeToggle"
               />
             </Grid>
           </Grid>
         </Typography>
       </Grid>
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
               label="Amount"
               type="number"
               fullWidth
-              value={amount}
-              onChange={(e) => setAmount(parseFloat(e.target.value))}
               required
+              {...register("amount", { required: "Amount is required" })}
             />
+            {errors.amount && (
+              <span role="alert" style={{ color: "red" }}>
+                {errors.amount.message}
+              </span>
+            )}
           </Grid>
           <Grid item xs={12}>
             <TextField
               label="Description"
               fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               required
+              {...register("description", {
+                required: "Description is required",
+              })}
             />
+            {errors.description && (
+              <span role="alert" style={{ color: "red" }}>
+                {errors.description.message}
+              </span>
+            )}
           </Grid>
-          {!isOtherIncomeEnabled && (
-            <>
-              <Grid item xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel>Bank Account</InputLabel>
-                  <Select
-                    value={bankAccount}
-                    onChange={(e) =>
-                      setBankAccount(e.target.value as BankAccount)
-                    }
-                  >
-                    {bankAccounts.map((option: BankAccount) => (
-                      <MenuItem key={option.bankName} value={option.bankName}>
-                        {`${option.bankName} - ${option?.lastFourDigit}`}
-                      </MenuItem>
-                    ))}
+          <Grid item xs={12}>
+            <FormControl fullWidth required>
+              <InputLabel>Income Category</InputLabel>
+              <Controller
+                render={({ field }) => (
+                  <Select {...field} value={field.value || ""}>
+                    {Object.values(
+                      isPseudoIncome ? OtherIncomeCategory : IncomeCategory
+                    ).map(
+                      (
+                        incomeCategory: OtherIncomeCategory | IncomeCategory
+                      ) => (
+                        <MenuItem key={incomeCategory} value={incomeCategory}>
+                          {isPseudoIncome
+                            ? OtherIncomeCategoryTitle[
+                                incomeCategory as OtherIncomeCategory
+                              ]
+                            : IncomeCategoryTitle[
+                                incomeCategory as IncomeCategory
+                              ]}
+                        </MenuItem>
+                      )
+                    )}
                   </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel>Income Category</InputLabel>
-                  <Select
-                    value={incomeCategory}
-                    onChange={(e) =>
-                      setIncomeCategory(e.target.value as IncomeCategory)
-                    }
-                  >
-                    {Object.values(IncomeCategory).map((category) => (
-                      <MenuItem key={category} value={category}>
-                        {IncomeCategoryTitle[category]}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-            </>
-          )}
-          {isOtherIncomeEnabled && (
+                )}
+                name="category"
+                control={control}
+                rules={{ required: "Income Category is required" }}
+              />
+              {errors.category && (
+                <span role="alert" style={{ color: "red" }}>
+                  {errors.category.message}
+                </span>
+              )}
+            </FormControl>
+          </Grid>
+          {!isPseudoIncome && (
             <Grid item xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Other Income Category</InputLabel>
-                <Select
-                  value={otherIncomeCategory}
-                  onChange={(e) =>
-                    setOtherIncomeCategory(
-                      e.target.value as OtherIncomeCategory
-                    )
-                  }
-                >
-                  {Object.values(OtherIncomeCategory).map((category) => (
-                    <MenuItem key={category} value={category}>
-                      {OtherIncomeCategoryTitle[category]}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <InputLabel>Bank Account</InputLabel>
+                <Controller
+                  render={({ field }) => (
+                    <Select {...field} value={field.value || ""}>
+                      {bankAccounts.map((option) => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {`${option.bankName} - ${option?.lastFourDigit}`}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                  name="bankAccountId"
+                  control={control}
+                  rules={{ required: "Bank Account is required" }}
+                />
+                {errors.bankAccountId && (
+                  <span role="alert" style={{ color: "red" }}>
+                    {errors.bankAccountId.message}
+                  </span>
+                )}
               </FormControl>
             </Grid>
           )}
         </Grid>
         <Button
-          type="button"
+          type="submit"
           variant="contained"
           color="primary"
           style={{ marginTop: "20px" }}
-          onClick={handleAddIncome}
         >
           Add Income
         </Button>
