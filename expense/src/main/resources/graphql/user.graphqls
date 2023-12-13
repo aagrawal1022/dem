@@ -73,7 +73,7 @@ type Expense {
 }
 
 type Mutation {
-  addCardDetails(cardDetails: CardDetailsDto): User
+  addCard(cardDetails: CardDetailsDto): User
   addBankAccount(bankDetails: BankDetailsDto): User
   removeCard(cardId: Int, userId: Int): User
   removeBankAccount(accountId: Int, userId: Int): User

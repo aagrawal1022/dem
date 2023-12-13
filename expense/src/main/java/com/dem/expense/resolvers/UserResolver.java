@@ -33,7 +33,7 @@ public class UserResolver {
     }
 
     @MutationMapping
-    public User addCardDetails(@Argument("cardDetails") CardDetailsDto cardDetailsDto) {
+    public User addCard(@Argument("cardDetails") CardDetailsDto cardDetailsDto) {
         return userService.addCardDetails(cardDetailsDto);
     }
 

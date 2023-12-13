@@ -1,3 +1,4 @@
+import { CardDetails } from "account/Card/CardDetails";
 import { Login } from "auth/login/Login";
 import { Logout } from "auth/logout/Logout";
 import { ExpenseForm } from "dashboard/expenseAddition/ExpenseForm";
@@ -41,6 +42,7 @@ const AppRouter = () => {
           <Route path="/" element={<PrivateRoute />}>
             <Route path="/add-expense" element={<ExpenseForm />} />
             <Route path="/add-income" element={<IncomeForm />} />
+            <Route path="/add-card" element={<CardDetails/>}/>
           </Route>
           <Route path="/logout" element={<Logout />} />
         </Routes>
